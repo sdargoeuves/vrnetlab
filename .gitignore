@@ -6,6 +6,8 @@ cisco*.bin
 *.gz
 *.xz
 *.vmdk
+*.ova
+*.ovf
 *.vdi
 *.iso
 *cidfile
