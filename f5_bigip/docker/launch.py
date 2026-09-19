@@ -11,6 +11,7 @@ import sys
 import tempfile
 import textwrap
 import time
+import uuid
 
 import vrnetlab
 
@@ -213,6 +214,8 @@ class F5BigIPVM(vrnetlab.VM):
                 f"file={self.cidata_iso},if=virtio,media=cdrom,format=raw,readonly=on",
             ]
         )
+        # generate UUID (the core reads the UUID env var centrally)
+        self.uuid = self.uuid or str(uuid.uuid4())
 
     def gen_mgmt(self):
         current = self.nic_type
