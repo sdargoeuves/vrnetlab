@@ -55,8 +55,8 @@ class AOSCX_vm(vrnetlab.VM):
         self.num_nics = 20
         self.nic_type = "virtio-net-pci"
 
-        # generate UUID
-        self.qemu_args.extend(["-uuid", os.getenv("UUID", str(uuid.uuid4()))])
+        # generate UUID (the core reads the UUID env var centrally)
+        self.uuid = self.uuid or str(uuid.uuid4())
 
     def bootstrap_spin(self):
         """This function should be called periodically to do work."""
