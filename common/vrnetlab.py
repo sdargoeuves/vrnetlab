@@ -13,6 +13,7 @@ import subprocess
 import sys
 import tempfile
 import time
+import uuid
 from pathlib import Path
 
 from scrapli import Driver
@@ -251,7 +252,7 @@ class VM:
         self.mgmt_intf = os.environ.get("CLAB_MGMT_INTF", mgmt_intf)
 
         # various settings
-        # start() appends "-uuid" to the qemu command when self.uuid is set.
+        # start() appends the UUID resolved by the uuid property to the qemu command.
         self._uuid = None
         self.fake_start_date = None
         self.nic_type = "e1000"
@@ -1412,14 +1413,16 @@ class VM:
     @property
     def uuid(self):
         """
-        Read the VM UUID from the UUID environment variable.
-        If the UUID environment variable is not set, the value assigned by the
-        kind (e.g. from FORTIGATE_UUID, a license file, or a random fallback)
-        is used; if nothing is set, no "-uuid" flag is passed to qemu.
+        Use an explicitly assigned UUID (e.g. from an SR OS license) first.
+        Otherwise, use the UUID environment variable or generate a random UUID.
+        Cache the result so it remains stable for this VM instance, including
+        across QEMU restarts.
         Should be provided in standard UUID format,
         e.g. 123e4567-e89b-12d3-a456-426614174000.
         """
-        return self._uuid or os.getenv("UUID")
+        if not self._uuid:
+            self._uuid = os.getenv("UUID") or str(uuid.uuid4())
+        return self._uuid
 
     @uuid.setter
     def uuid(self, value):
